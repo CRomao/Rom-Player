@@ -14,13 +14,13 @@ texto_preto = (0,0,0)
 os.environ['SDL_VIDEO_CENTERED']='1'
 largura = 750
 altura = 300
-# tenta carregar as musicas do arquivo se existir, se não ele cria o arquivo
+# tenta carregar as musicas do arquivo se existir. Se não, ele cria o arquivo.
 try:
-    open('musicas\lista_music.txt', 'r')
-    open('musicas\lista.txt', 'r')
+    open('musicas\diretorio.romp', 'r')
+    open('musicas\musicas.romp', 'r')
 except:
-    open('musicas\lista_music.txt', 'w')
-    open('musicas\lista.txt', 'w')
+    open('musicas\diretorio.romp', 'w')
+    open('musicas\musicas.romp', 'w')
 
 #BOTOES
 botao_esquerda = pygame.image.load("icones\icon_esquerda.png")
@@ -55,11 +55,11 @@ img6[1] = 250
 
 divisor_x = 5
 pygame.mixer.init() # inicia o mixer do pygame
-lista = []
 fundo = pygame.display.set_mode((largura,altura))
 pygame.display.set_caption("Rom Player")
 pygame.display.set_icon(pygame.image.load('icones\icon_player.ico'))
 listaNomes = []
+lista = []
 pygame.font.init() # inicia as fontes das letras
 fonte_padrao = pygame.font.get_default_font()
 fonte_addMusica = pygame.font.SysFont("comicsansms", 20)
@@ -79,7 +79,6 @@ valor_aleat = 0
 z = 0
 v = 0
 prox = ''
-minimizar = 0
 
 def chamarTelaListaMusicas():
     janela = Tk()
@@ -131,18 +130,18 @@ def removerMusica():
 
 def salvarLista():
     global listaNomes, lista
-    arquivo = open('musicas\lista_music.txt', 'w')
-    arquivo_lista = open('musicas\lista.txt', 'w')
+    dirMusica = open('musicas\diretorio.romp', 'w')
+    nomeMusica = open('musicas\musicas.romp', 'w')
     for i  in range(len(listaNomes)):
-        arquivo.writelines(listaNomes[i])
-        arquivo.writelines("\n")
+        dirMusica.writelines(listaNomes[i])
+        dirMusica.writelines("\n")
     for i  in range(len(lista)):
-	    arquivo_lista.writelines(lista[i])
-	    arquivo_lista.writelines("\n")
+	    nomeMusica.writelines(lista[i])
+	    nomeMusica.writelines("\n")
 
 opcoes = {}
 def adicionarMusica():
-	global listaNomes, opcoes, lista, musica_e, z, fundo, cor_fundo_escolhida, minimizar, botao_play, valor_play_pause
+	global listaNomes, opcoes, lista, musica_e, z, fundo, cor_fundo_escolhida, botao_play, valor_play_pause
 	jatem = False
 	root = Tk()
 	root.geometry('0x0')
@@ -177,20 +176,18 @@ def adicionarMusica():
 				z = len(lista) - 1
 			except:
 				pyautogui.alert(text='Não foi possível reproduzir a música!', title='Erro', button='OK')
-				listaNomes = listaNomes
-				lista = lista
 		if valor_play_pause == 1 and jatem == False:
 			botao_play = pygame.image.load("icones\icon_play_pause.png")
 			valor_play_pause = 0
 	except AttributeError as error:
 		listaNomes = listaNomes
 		lista = lista
-	minimizar = 1
 	salvarLista()
+
 def lerListaMusics():
 	global listaNomes, lista
-	arquivo_lista = open('musicas\lista.txt', 'r')
-	arquivo = open('musicas\lista_music.txt', 'r')
+	arquivo_lista = open('musicas\musicas.romp', 'r')
+	arquivo = open('musicas\diretorio.romp', 'r')
 	listaNomes = arquivo.readlines()
 	lista = arquivo_lista.readlines()
 	for i in range(len(listaNomes)):
@@ -234,14 +231,20 @@ def validarPassagemMusica2():
 				lista.remove(lista[z])
 				listaNomes.remove(listaNomes[z])
 				salvarLista()
-def musicaAlearoriaAtivada():
-    global z, lista, listaNomes, musica_e
-    z = randint(0,(len(listaNomes)-1))
-    musica_e = lista[z]
-    fundo.fill(cor_fundo_escolhida)
-    pygame.mixer.music.load(listaNomes[z])
-    pygame.mixer.music.play()
 
+def musicaAlearoriaAtivada():
+	global z, lista, listaNomes, musica_e
+	if len(listaNomes) == 0:
+		musica_e = 'Adicione uma música para tocar'
+	else:
+		z = randint(0,(len(listaNomes)-1))
+		musica_e = lista[z]
+		fundo.fill(cor_fundo_escolhida)
+		pygame.mixer.music.load(listaNomes[z])
+		pygame.mixer.music.play()
+
+# vai carregar a lista de musicas dos arquivos txt e vai verificar se realmente está naquele diretório
+#tentando tocar elas.
 lerListaMusics()
 if len(lista) == 0:
     musica_e = 'Adicione uma música para tocar'
@@ -258,149 +261,152 @@ else:
 			else:
 				del(lista[0])
 				del(listaNomes[0])
-		
-				
-while a:
-    if valor_aleat == 1 and not pygame.mixer.music.get_busy():
-        musicaAlearoriaAtivada()
-    elif not pygame.mixer.music.get_busy() and musica_e != 'Adicione uma música para tocar' and valor_repet_all == 0:
-        z = z + 1
-        if z > (len(listaNomes) - 1):
-            z = 0
-        validarPassagemMusica2()
-        fundo.fill(cor_fundo_escolhida)
-    elif valor_repet_all == 1 and not pygame.mixer.music.get_busy() and musica_e != 'Adicione uma música para tocar':
-        pygame.mixer.music.load(listaNomes[z])
-        pygame.mixer.music.play()
-    time.sleep(0.5)
-    for event  in pygame.event.get():
-        if event.type == pygame.QUIT:
-            a = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_pos = event.pos
-            mouse_posX = event.pos
-            if (mouse_pos[0] >= 437 and mouse_pos[0] <= 489) and (mouse_pos[1] >= 15 and mouse_pos[1] <= 67): # se clicar na lista das musicas
-                chamarTelaListaMusicas()
-            if musica_e != 'Adicione uma música para tocar':
-                if (mouse_pos[0] >= 433 and mouse_pos[0] <= 453) and (mouse_pos[1] >= 252 and mouse_pos[1] <= 272): # clicou no aleatorio
-                    if valor_aleat == 0:
-                        botao_aleat = pygame.image.load("icones\icon_aleat_ativ.png")
-                        valor_aleat = 1
-                    elif valor_aleat == 1:
-                        botao_aleat = pygame.image.load("icones\icon_aleat_desat.png")
-                        valor_aleat = 0
-                if (mouse_pos[0] >= 467 and mouse_pos[0] <= 487) and (mouse_pos[1] >= 252 and mouse_pos[1] <= 272): # clicou no de repetir
-                    if valor_repet_all == 0:
-                        botao_repet_all = pygame.image.load("icones\icon_repet_atual.png")
-                        valor_repet_all = 1
-                    elif valor_repet_all == 1:
-                        botao_repet_all = pygame.image.load("icones\icon_repet_all.png")
-                        valor_repet_all = 0
-                if (mouse_pos[0] >= 222 and mouse_pos[0] <= 274) and (mouse_pos[1] >= 159 and mouse_pos[1] <= 208): # quando clica no de pausar
-                    if valor_play_pause == 0:
-                        botao_play = pygame.image.load("icones\icon_play.png")
-                        valor_play_pause = 1
-                        pygame.mixer.music.pause()
-                        if v != z:
-                            v = z
-                    else:
-                        botao_play = pygame.image.load("icones\icon_play_pause.png")
-                        valor_play_pause = 0
-                        if v == z:
-	                        pygame.mixer.music.unpause()
-                        elif v != z and z == prox:
-                            pygame.mixer.music.load(listaNomes[z])
-                            pygame.mixer.music.play()
-                            v = z
-                        else:
-                            pygame.mixer.music.load(listaNomes[z])
-                            pygame.mixer.music.play()
-                            v = z
-                if (mouse_pos[0] >= 335 and mouse_pos[0] <= 389) and (mouse_pos[1] >= 159 and mouse_pos[1] <= 208): # direita
-                    if valor_aleat == 0:
-                        cor_fundo_escolhida = cor_fundo_padrao
-                        fundo.fill(cor_fundo_escolhida)
-                        v = z
-                        z += 1
-                        prox = z
-                        if z > (len(listaNomes)-1):
-                            z = 0
-                        validarPassagemMusica2()
-                    else:
-                        musicaAlearoriaAtivada()
-                if (mouse_pos[0] >= 107 and mouse_pos[0] <= 159) and (mouse_pos[1] >= 159 and mouse_pos[1] <= 208): # esquerda
-                    if valor_aleat == 0:
-                        cor_fundo_escolhida = cor_fundo_padrao
-                        fundo.fill(cor_fundo_escolhida)
-                        v = z
-                        z -= 1
-                        prox = z
-                        if z < 0:
-                            z = (len(listaNomes) - 1)
-                        validarPassagemMusica2()
-                    else:
-                        musicaAlearoriaAtivada()
-        if event.type == pygame.KEYDOWN:
-            if musica_e != 'Adicione uma música para tocar':
-                if event.key == pygame.K_RIGHT:
-                    if valor_aleat == 0:
-                        cor_fundo_escolhida = cor_fundo_padrao
-                        fundo.fill(cor_fundo_escolhida)
-                        v = z
-                        z += 1
-                        if z > (len(listaNomes) - 1):
-                            z = 0
-                        validarPassagemMusica2()
-                    else:
-                        musicaAlearoriaAtivada()
-                if event.key == pygame.K_LEFT:
-                    if valor_aleat == 0:
-                        cor_fundo_escolhida = cor_fundo_padrao
-                        fundo.fill(cor_fundo_escolhida)
-                        v = z
-                        z -= 1
-                        if z < 0:
-                            z = (len(listaNomes) - 1)
-                        validarPassagemMusica2()
-                    else:
-                        musicaAlearoriaAtivada()
-                if event.key == pygame.K_SPACE:
-                    if valor_play_pause == 0:
-                        botao_play = pygame.image.load("icones\icon_play.png")
-                        valor_play_pause = 1
-                        pygame.mixer.music.pause()
-                        if v != z:
-                            v = z
-                    else:
-                        botao_play = pygame.image.load("icones\icon_play_pause.png")
-                        valor_play_pause = 0
-                        if v == z:
-                            pygame.mixer.music.unpause()
-                        elif v != z and z == prox:
-                            validarPassagemMusica()
-                        else:
-                            validarPassagemMusica()
-            if event.key == pygame.K_a:
-                adicionarMusica()
-            if event.key == pygame.K_c:
-                a = False
-            if event.key == pygame.K_r:
-                removerMusica()
-    texto_addMusica = fonte_addMusica.render('[A] - Adicionar Música', True, (texto_preto))
-    fundo.blit(texto_addMusica, (510,0))
-    texto_removerMusica = fonte_removerMusica.render('[R] - Remover Música', True, (texto_preto))
-    fundo.blit(texto_removerMusica, (510,25))
-    texto_sair = fonte_sair.render('[C] - Sair', True, (texto_preto))
-    fundo.blit(texto_sair, (510, 50))
-    texto_nome_music = fonte_nome_music.render(musica_e, True, (texto_preto))
-    pygame.draw.rect(fundo, texto_preto, [500, 0, divisor_x, altura])
-    fundo.blit(texto_nome_music, (90, 70))
-    fundo.blit(botao_esquerda, (img1[0], img1[1]))
-    fundo.blit(botao_direita, (img2[0], img2[1]))
-    fundo.blit(botao_play, (img3[0], img3[1]))
-    fundo.blit(botao_lista, (img4[0], img4[1]))
-    fundo.blit(botao_repet_all, (img5[0], img5[1]))
-    fundo.blit(botao_aleat, (img6[0], img6[1]))
-    pygame.display.update()
-    pygame.display.flip()
+					
+while a: # inicio do loop geral
+	if valor_aleat == 1 and not pygame.mixer.music.get_busy(): # IF para se a música aleatoria for ativada.
+		musicaAlearoriaAtivada()
+	elif not pygame.mixer.music.get_busy() and musica_e != 'Adicione uma música para tocar' and valor_repet_all == 0: # IF pra repetir a lista de músicas
+		z = z + 1
+		if z > (len(listaNomes) - 1):
+			z = 0
+		validarPassagemMusica2()
+		fundo.fill(cor_fundo_escolhida)
+	elif valor_repet_all == 1 and not pygame.mixer.music.get_busy() and musica_e != 'Adicione uma música para tocar': # IF para repetir somente uma música.
+		try:
+			fundo.fill(cor_fundo_escolhida)
+			musica_e = lista[z]
+			pygame.mixer.music.load(listaNomes[z])
+			pygame.mixer.music.play()
+		except:
+			fundo.fill(cor_fundo_escolhida)
+	time.sleep(0.5) # Controla o acesso a CPU
+	for event  in pygame.event.get():
+		if event.type == pygame.QUIT:
+			a = False
+		if event.type == pygame.MOUSEBUTTONDOWN: # Saber a posição em que o mouse está clicando na tela.
+			mouse_pos = event.pos
+			if (mouse_pos[0] >= 437 and mouse_pos[0] <= 489) and (mouse_pos[1] >= 15 and mouse_pos[1] <= 67): # se clicar na lista das musicas
+				chamarTelaListaMusicas()
+			if musica_e != 'Adicione uma música para tocar':
+				if (mouse_pos[0] >= 433 and mouse_pos[0] <= 453) and (mouse_pos[1] >= 252 and mouse_pos[1] <= 272): # clicou no aleatorio
+					if valor_aleat == 0:
+						botao_aleat = pygame.image.load("icones\icon_aleat_ativ.png") # valor zero é desativado
+						valor_aleat = 1
+					elif valor_aleat == 1:
+						botao_aleat = pygame.image.load("icones\icon_aleat_desat.png") # valor 1 é ativado
+						valor_aleat = 0
+				if (mouse_pos[0] >= 467 and mouse_pos[0] <= 487) and (mouse_pos[1] >= 252 and mouse_pos[1] <= 272): # clicou no de repetir
+					if valor_repet_all == 0:
+						botao_repet_all = pygame.image.load("icones\icon_repet_atual.png") # valor zero é pra repetir todas da lista.
+						valor_repet_all = 1
+					elif valor_repet_all == 1:
+						botao_repet_all = pygame.image.load("icones\icon_repet_all.png") # valor 1 é para repetir só uma.
+						valor_repet_all = 0
+				if (mouse_pos[0] >= 222 and mouse_pos[0] <= 274) and (mouse_pos[1] >= 159 and mouse_pos[1] <= 208): # quando clica no de pausar
+					if valor_play_pause == 0:
+						botao_play = pygame.image.load("icones\icon_play.png")
+						valor_play_pause = 1
+						pygame.mixer.music.pause()
+						if v != z:
+							v = z
+					else:
+						botao_play = pygame.image.load("icones\icon_play_pause.png")
+						valor_play_pause = 0
+						if v == z:
+							pygame.mixer.music.unpause()
+						elif v != z and z == prox:
+							pygame.mixer.music.load(listaNomes[z])
+							pygame.mixer.music.play()
+							v = z
+						else:
+							pygame.mixer.music.load(listaNomes[z])
+							pygame.mixer.music.play()
+							v = z
+				if (mouse_pos[0] >= 335 and mouse_pos[0] <= 389) and (mouse_pos[1] >= 159 and mouse_pos[1] <= 208): # Clique do mouse na direita
+					if valor_aleat == 0:
+						cor_fundo_escolhida = cor_fundo_padrao
+						fundo.fill(cor_fundo_escolhida)
+						v = z
+						z += 1
+						prox = z
+						if z > (len(listaNomes)-1):
+							z = 0
+						validarPassagemMusica2()
+					else:
+						musicaAlearoriaAtivada()
+				if (mouse_pos[0] >= 107 and mouse_pos[0] <= 159) and (mouse_pos[1] >= 159 and mouse_pos[1] <= 208): # Clique do mouse na esquerda
+					if valor_aleat == 0:
+						cor_fundo_escolhida = cor_fundo_padrao
+						fundo.fill(cor_fundo_escolhida)
+						v = z
+						z -= 1
+						prox = z
+						if z < 0:
+							z = (len(listaNomes) - 1)
+						validarPassagemMusica2()
+					else:
+						musicaAlearoriaAtivada()
+		if event.type == pygame.KEYDOWN:
+			if musica_e != 'Adicione uma música para tocar':
+				if event.key == pygame.K_RIGHT: # seta do teclado para a direita
+					if valor_aleat == 0:
+						cor_fundo_escolhida = cor_fundo_padrao
+						fundo.fill(cor_fundo_escolhida)
+						v = z
+						z += 1
+						if z > (len(listaNomes) - 1):
+							z = 0
+						validarPassagemMusica2()
+					else:
+						musicaAlearoriaAtivada()
+				if event.key == pygame.K_LEFT: # seta do teclado para a esquerda.
+					if valor_aleat == 0:
+						cor_fundo_escolhida = cor_fundo_padrao
+						fundo.fill(cor_fundo_escolhida)
+						v = z
+						z -= 1
+						if z < 0:
+							z = (len(listaNomes) - 1)
+						validarPassagemMusica2()
+					else:
+						musicaAlearoriaAtivada()
+				if event.key == pygame.K_SPACE: # se a tecla do espaço for apertada
+					if valor_play_pause == 0:
+						botao_play = pygame.image.load("icones\icon_play.png")
+						valor_play_pause = 1
+						pygame.mixer.music.pause()
+						if v != z:
+							v = z
+					else:
+						botao_play = pygame.image.load("icones\icon_play_pause.png")
+						valor_play_pause = 0
+						if v == z:
+							pygame.mixer.music.unpause()
+						elif v != z and z == prox:
+							validarPassagemMusica()
+						else:
+							validarPassagemMusica()
+			if event.key == pygame.K_a: # tecla A apertada
+				adicionarMusica()
+			if event.key == pygame.K_c: # tecla C apertada
+				a = False
+			if event.key == pygame.K_r: # tecla R apertada
+				removerMusica()
+	texto_addMusica = fonte_addMusica.render('[A] - Adicionar Música', True, (texto_preto))
+	fundo.blit(texto_addMusica, (510,0))
+	texto_removerMusica = fonte_removerMusica.render('[R] - Remover Música', True, (texto_preto))
+	fundo.blit(texto_removerMusica, (510,25))
+	texto_sair = fonte_sair.render('[C] - Sair', True, (texto_preto))
+	fundo.blit(texto_sair, (510, 50))
+	texto_nome_music = fonte_nome_music.render(musica_e, True, (texto_preto))
+	pygame.draw.rect(fundo, texto_preto, [500, 0, divisor_x, altura])
+	fundo.blit(texto_nome_music, (90, 70))
+	fundo.blit(botao_esquerda, (img1[0], img1[1]))
+	fundo.blit(botao_direita, (img2[0], img2[1]))
+	fundo.blit(botao_play, (img3[0], img3[1]))
+	fundo.blit(botao_lista, (img4[0], img4[1]))
+	fundo.blit(botao_repet_all, (img5[0], img5[1]))
+	fundo.blit(botao_aleat, (img6[0], img6[1]))
+	pygame.display.update()
+	pygame.display.flip()
 pygame.quit()

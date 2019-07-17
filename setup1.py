@@ -3,16 +3,16 @@ import sys
 import os
 
 includes = []
-include_files = [r"C:\Users\Suporte-06\AppData\Local\Programs\Python\Python36-32\DLLs\tcl86t.dll",
-                 r"C:\Users\Suporte-06\AppData\Local\Programs\Python\Python36-32\DLLs\tk86t.dll",
+include_files = [r"C:\Users\Romão\AppData\Local\Programs\Python\Python36\DLLs\tcl86t.dll",
+                 r"C:\Users\Romão\AppData\Local\Programs\Python\Python36\DLLs\tk86t.dll",
 				 r'icones\icon_direita.png',
 				 r'icones\icon_esquerda.png',
 				 r'icones\icon_lista.png',
 				 r'icones\icon_play.png',
 				 r'icones\icon_play_pause.png',
 				 r'icones\icon_player.ico']
-os.environ['TCL_LIBRARY'] = r'C:\Users\Suporte-06\AppData\Local\Programs\Python\Python36-32\tcl\tcl8.6'
-os.environ['TK_LIBRARY'] = r'C:\Users\Suporte-06\AppData\Local\Programs\Python\Python36-32\tcl\tk8.6'
+os.environ['TCL_LIBRARY'] = r'C:\Users\Romão\AppData\Local\Programs\Python\Python36\tcl\tcl8.6'
+os.environ['TK_LIBRARY'] = r'C:\Users\Romão\AppData\Local\Programs\Python\Python36\tcl\tk8.6'
 base = 'Win32GUI' if sys.platform == 'win32' else None
 
 

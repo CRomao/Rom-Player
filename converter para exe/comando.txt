@@ -1,0 +1,7 @@
+comando para coverter para .exe
+
+python setup1.py bdist_msi
+
+
+
+usar o setup1.py
