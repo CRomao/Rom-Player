@@ -9,4 +9,5 @@ O Player inclui funções como:
 * Remover músicas;
 * Repetir a música atual;
 * Repetir todas as músicas;
-* Tocar músicas aleatoriamente.
+* Tocar músicas aleatoriamente;
+* Listar todas as músicas adicionadas.
